@@ -11,7 +11,10 @@ import java.util.Set;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +22,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class Quiz extends Activity {
+	
+	private static final String TAG = "QuizActivity";
 	
 	// args for the fragment
 	private static final String QUESTION = "question";
@@ -38,6 +43,13 @@ public class Quiz extends Activity {
 	private int button_2 = 0;
 	private int button_3 = 0;
 	private int button_4 = 0;
+	
+	// We have one button handler, and we pause between clicks. We only allow one click per question.
+	// So this boolean gates the buttonClick function to ignore new input until we draw a new question (fragment)
+	// and reset this flag.
+	private boolean clicked = false;
+	
+	Handler handler;
 	
 	private Integer evaluate (String myOperator, Integer myOperand1, Integer myOperand2) {
 		switch (myOperator) {
@@ -139,12 +151,14 @@ public class Quiz extends Activity {
 		fragment.setArguments(args);
 		t.replace(R.id.container, fragment);
 		t.commit();
+		clicked = false;
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		handler = new Handler();
 		if (savedInstanceState == null) {
 			newQuestion();
 		}
@@ -152,8 +166,40 @@ public class Quiz extends Activity {
 	
 	// There is only one handler for all the question buttons.
 	public void buttonClick (View view) {
-		// BUGBUG:check the answer and update score and history
-		newQuestion();
+		if (clicked) {
+			return;
+		}
+		clicked = true; // no more clicks
+		// NEWREL:This button binding is not good...refactor to something less coupled.
+		Integer userAnswer;
+		switch(view.getId()) {
+		case R.id.button_1:
+			userAnswer = button_1;
+			break;
+		case R.id.button_2:
+			userAnswer = button_2;
+			break;
+		case R.id.button_3:
+			userAnswer = button_3;
+			break;
+		case R.id.button_4:
+			userAnswer = button_4;
+			break;
+		default:
+			Log.e(TAG, "buttonClick: Unknown Button");
+			userAnswer = 0;
+			break;
+		}
+		if (answer == userAnswer) {
+			view.setBackgroundColor(Color.parseColor("#30E873"));
+		} else {
+			view.setBackgroundColor(Color.parseColor("#FF1028"));
+		}
+		handler.postDelayed(new Runnable() {
+			public void run () {
+				newQuestion();
+			}
+		}, 750); // NEWREL: make this delay configurable in user preferences
 	}
 
 	public static class QuestionFragment extends Fragment {
