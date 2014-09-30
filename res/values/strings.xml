@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Maths</string>
+    <string name="app_description">Maths is an simple game application for studying math facts.<br/>
+        Click the Quiz button to get started testing.<br/> 
+        Change what you want to test in settings.</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_quiz">Quiz</string>
+    
+</resources>
