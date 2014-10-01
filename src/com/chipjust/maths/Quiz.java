@@ -50,6 +50,7 @@ public class Quiz extends Activity {
 	private boolean clicked = false;
 	
 	Handler handler;
+	Runnable runNewQuestion;
 	
 	private Integer evaluate (String myOperator, Integer myOperand1, Integer myOperand2) {
 		switch (myOperator) {
@@ -159,6 +160,10 @@ public class Quiz extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		handler = new Handler();
+		runNewQuestion = new Runnable() {
+			public void run () {
+				newQuestion();
+			}};
 		if (savedInstanceState == null) {
 			newQuestion();
 		}
@@ -195,11 +200,7 @@ public class Quiz extends Activity {
 		} else {
 			view.setBackgroundColor(Color.parseColor("#FF1028"));
 		}
-		handler.postDelayed(new Runnable() {
-			public void run () {
-				newQuestion();
-			}
-		}, 750); // NEWREL: make this delay configurable in user preferences
+		handler.postDelayed(runNewQuestion, 750); // NEWREL: make this delay configurable in user preferences
 	}
 
 	public static class QuestionFragment extends Fragment {
