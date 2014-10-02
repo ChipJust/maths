@@ -1,10 +1,13 @@
 package com.chipjust.maths;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -27,10 +30,8 @@ public class Quiz extends Activity {
 	
 	// args for the fragment
 	private static final String QUESTION = "question";
-	private static final String BUTTON_1 = "button_1";
-	private static final String BUTTON_2 = "button_2";
-	private static final String BUTTON_3 = "button_3";
-	private static final String BUTTON_4 = "button_4";
+	private static final String BUTTONS = "buttons";
+	private Map<Integer, Integer> buttons;
 	
 	private static final List<String> operators = Arrays.asList("+", "-", "x", "/");
 	private static final List<Integer> numbers = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
@@ -39,10 +40,6 @@ public class Quiz extends Activity {
 	private String operator = "?";
 	private int answer = 0;
 	
-	private int button_1 = 0;
-	private int button_2 = 0;
-	private int button_3 = 0;
-	private int button_4 = 0;
 	
 	// We have one button handler, and we pause between clicks. We only allow one click per question.
 	// So this boolean gates the buttonClick function to ignore new input until we draw a new question (fragment)
@@ -129,19 +126,15 @@ public class Quiz extends Activity {
 		myAnswers.subList(3, myAnswers.size()).clear();
 		myAnswers.add(answer); // add the correct answer last
 		Collections.shuffle(myAnswers);
-		button_1 = myAnswers.get(0);
-		button_2 = myAnswers.get(1);
-		button_3 = myAnswers.get(2);
-		button_4 = myAnswers.get(3);
+		buttons.put(R.id.button_1, myAnswers.get(0));
+		buttons.put(R.id.button_2, myAnswers.get(1));
+		buttons.put(R.id.button_3, myAnswers.get(2));
+		buttons.put(R.id.button_4, myAnswers.get(3));
 		
 		// Fill in the bundle with question and answers
 		Bundle args = new Bundle();
 		args.putString(QUESTION, String.format("%d %s %d", operand1, operator, operand2));
-		args.putString(BUTTON_1, String.format("%d", button_1));
-		args.putString(BUTTON_2, String.format("%d", button_2));
-		args.putString(BUTTON_3, String.format("%d", button_3));
-		args.putString(BUTTON_4, String.format("%d", button_4));
-		
+		args.putSerializable(BUTTONS, (Serializable) buttons);
 		return args;
 	}
 
@@ -164,6 +157,7 @@ public class Quiz extends Activity {
 			public void run () {
 				newQuestion();
 			}};
+		buttons = new HashMap<Integer, Integer>();
 		if (savedInstanceState == null) {
 			newQuestion();
 		}
@@ -175,30 +169,18 @@ public class Quiz extends Activity {
 			return;
 		}
 		clicked = true; // no more clicks
-		// NEWREL:This button binding is not good...refactor to something less coupled.
-		Integer userAnswer;
-		switch(view.getId()) {
-		case R.id.button_1:
-			userAnswer = button_1;
-			break;
-		case R.id.button_2:
-			userAnswer = button_2;
-			break;
-		case R.id.button_3:
-			userAnswer = button_3;
-			break;
-		case R.id.button_4:
-			userAnswer = button_4;
-			break;
-		default:
-			Log.e(TAG, "buttonClick: Unknown Button");
-			userAnswer = 0;
-			break;
-		}
+		Integer userAnswer = buttons.get(view.getId());
 		if (answer == userAnswer) {
 			view.setBackgroundColor(Color.parseColor("#30E873"));
 		} else {
 			view.setBackgroundColor(Color.parseColor("#FF1028"));
+			// find the right answer and turn than button green.
+			for (Object button : buttons.keySet()) {
+				if ((int) buttons.get(button) == answer) {
+					findViewById((int) button).setBackgroundColor(Color.parseColor("#30E873"));
+					break;
+				}
+			}
 		}
 		handler.postDelayed(runNewQuestion, 750); // NEWREL: make this delay configurable in user preferences
 	}
@@ -209,10 +191,10 @@ public class Quiz extends Activity {
 			View rootView = inflater.inflate(R.layout.fragment_question, container, false);
 			Bundle args = getArguments();
 			((TextView) rootView.findViewById(R.id.question)).setText(args.getString(QUESTION, "No Question"));
-			((Button) rootView.findViewById(R.id.button_1)).setText(args.getString(BUTTON_1, "No Button 1"));
-			((Button) rootView.findViewById(R.id.button_2)).setText(args.getString(BUTTON_2, "No Button 2"));
-			((Button) rootView.findViewById(R.id.button_3)).setText(args.getString(BUTTON_3, "No Button 3"));
-			((Button) rootView.findViewById(R.id.button_4)).setText(args.getString(BUTTON_4, "No Button 4"));
+			Map<Integer, Integer> buttonMap = (Map<Integer, Integer>) args.getSerializable(BUTTONS);
+			for (Object button : buttonMap.keySet()) {
+				((Button) rootView.findViewById((int) button)).setText(String.format("%d", buttonMap.get(button)));
+			}
 			return rootView;
 		}
 	}
