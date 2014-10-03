@@ -88,73 +88,67 @@ public class Quiz extends Activity {
 		return 0;
 	}
 
+	private List<Integer> generateWrongAnswers (List<String> myOperators, int operand1, int operand2, int numberOfWrongAnswers) {
+		// NEWREL: maybe add a transpose wrong answer, so if the answer was 81 we should have a wrong answer of 18 available - my children do this...
+		Set<Integer> wrongAnswers = new HashSet<Integer>();
+		
+		Integer wrongAnswer;
+		for (String op : myOperators) {
+			for (Integer delta : new Integer[] {0, 1, -1, 2, -2}) {
+				wrongAnswer = evaluate (op, operand1+delta, operand2);
+				if (wrongAnswer != answer && wrongAnswer > 0) {
+					wrongAnswers.add(wrongAnswer);
+				}
+				wrongAnswer = evaluate (op, operand1, operand2+delta);
+				if (wrongAnswer != answer && wrongAnswer > 0) {
+					wrongAnswers.add(wrongAnswer);
+				}
+			}
+		}
+		
+		List<Integer> wrongAnswersList = new ArrayList<Integer>();
+		wrongAnswersList.addAll(wrongAnswers);
+		Collections.shuffle(wrongAnswersList);
+		wrongAnswersList.subList(numberOfWrongAnswers, wrongAnswersList.size()).clear();	
+		return wrongAnswersList;
+	}
+	
 	private Bundle setNewQuestion() {
-		int i;
 		Random rand = new Random();
 
 		// NEWREL:we could filter the list of operands by the user preferences
 		// NEWREL:we could filter the list of numbers by the user preferences
 
 		// Operator
-		List<String> myOperators = new ArrayList<String>();// NEWREL: move this step to generateWrongAnswers
-		myOperators.addAll(operators);// NEWREL: move this step to generateWrongAnswers
-		i = rand.nextInt(myOperators.size());
-		operator = myOperators.get(i);
-		myOperators.remove(i);// NEWREL: move this step to generateWrongAnswers
+		List<String> myOperators = new ArrayList<String>();
+		myOperators.addAll(operators);
+		operator = myOperators.get(rand.nextInt(myOperators.size()));
 		
 		// Operands
-		// NEWREL: selection of operands needs to consider the operator.
-		//         In particular div needs a large operand1 which other operators don't
-		//		   maybe we should use mult for div, so instead of random selction of x and y in x/y=z
-		//         we select y and z from our range and x = y*z
-		// NEWREL: need to add some user preference for keeping things positive.
-		//         negative numbers as results are harder, that is more advanced and we need to be
-		//         able to configure it so that we avoid those questions, again maybe do the selection
-		//         of y and z in x - y = z and x = z + y
-		i = rand.nextInt(numbers.size());
-		operand1 = numbers.get(i);
-		i = rand.nextInt(numbers.size());
-		operand2 = numbers.get(i);
+		int num1 =  numbers.get(rand.nextInt(numbers.size()));
+		int num2 =  numbers.get(rand.nextInt(numbers.size()));
+		switch (operator) {
+		case "/":
+			operand1 = num1 * num2;
+			operand2 = num2;
+			break;
+		case "-":
+			operand1 = num1 + num2;
+			operand2 = num2;
+			break;
+		default:
+			operand1 = num1;
+			operand2 = num2;
+			break;
+		}
 		
 		// Right Answer
 		answer = evaluate (operator, operand1, operand2);
 		
-		// Wrong Answers
-		// NEWREL: This should be in a function, maybe Set<Integer> wrongAnswers = generateWrongAnswers(op, operand1, operand2, delta, numberOfWrongAnswers);
-		// NEWREL: maybe add a transpose wrong answer, so if the answer was 81 we should have a wrong answer of 18 available - my children do this...
-		Set<Integer> wrongAnswers = new HashSet<Integer>();
-		Integer wrongAnswer;
-		for (String op : myOperators) {
-			wrongAnswer = evaluate (op, operand1, operand2);
-			if (wrongAnswer != answer) {
-				wrongAnswers.add(wrongAnswer);
-			}
-		}
-		for (Integer delta : new Integer[] {1, 2, 10}) {
-			wrongAnswer = evaluate (operator, operand1+delta, operand2);
-			if (wrongAnswer != answer) {
-				wrongAnswers.add(wrongAnswer);
-			}
-			wrongAnswer = evaluate (operator, operand1, operand2+delta);
-			if (wrongAnswer != answer) {
-				wrongAnswers.add(wrongAnswer);
-			}
-			wrongAnswer = evaluate (operator, operand1-delta, operand2);
-			if (wrongAnswer != answer) {
-				wrongAnswers.add(wrongAnswer);
-			}
-			wrongAnswer = evaluate (operator, operand1, operand2-delta);
-			if (wrongAnswer != answer) {
-				wrongAnswers.add(wrongAnswer);
-			}
-		}
-		
 		// Shuffle answers and assign to buttons
 		List<Integer> myAnswers = new ArrayList<Integer>();
-		myAnswers.addAll(wrongAnswers);
-		Collections.shuffle(myAnswers); // NEWREL: move this step to generateWrongAnswers
-		myAnswers.subList(3, myAnswers.size()).clear(); // NEWREL: move this step to generateWrongAnswers
-		myAnswers.add(answer); // add the correct answer last
+		myAnswers.addAll(generateWrongAnswers(myOperators, operand1, operand2, 3));
+		myAnswers.add(answer);
 		Collections.shuffle(myAnswers);
 		buttons.put(R.id.button_1, myAnswers.get(0));
 		buttons.put(R.id.button_2, myAnswers.get(1));
