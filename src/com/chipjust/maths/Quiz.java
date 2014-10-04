@@ -17,6 +17,7 @@ import android.app.FragmentTransaction;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,7 +52,7 @@ public class Quiz extends Activity {
 	Handler handler;
 	Runnable runNewQuestion;
 	
-	// NEWREL: make a timer
+	long questionStart;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +64,6 @@ public class Quiz extends Activity {
 				newQuestion();
 			}};
 		buttons = new HashMap<Integer, Integer>();
-		// NEWREL: initialize the timer
 		if (savedInstanceState == null) {
 			newQuestion();
 		}
@@ -170,7 +170,7 @@ public class Quiz extends Activity {
 		t.replace(R.id.container, fragment);
 		t.commit();
 		clicked = false;
-		// NEWREL: start the timer
+		questionStart = SystemClock.uptimeMillis ();
 	}
 	
 	// There is only one handler for all the question buttons.
@@ -194,6 +194,8 @@ public class Quiz extends Activity {
 			}
 		}
 		// NEWREL: log the question, answer, userAnswer and time-consumed-on-this-question in history
+		long elapsedTime = SystemClock.uptimeMillis () - questionStart;
+		Log.v(TAG, String.format("%dms", elapsedTime));
 		// NEWREL: calculate time remaining and only run the next question if there is time remaining
 		handler.postDelayed(runNewQuestion, 750); // NEWREL: make this delay configurable in user preferences
 	}
