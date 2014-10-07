@@ -1,5 +1,8 @@
 package com.chipjust.maths;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.chipjust.maths.Quiz.QuestionFragment;
 
 import android.app.Activity;
@@ -15,29 +18,29 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.os.Build;
 
 public class MainActivity extends Activity {
 	
-	private static final String USER_NAME = "user_name";
-	private String user;
+	private static final String USER_LIST = "user_list";
+	private static final String NEW_USER = "New User";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+		//SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
 		//SharedPreferences.Editor editor = sharedPref.edit();
-		user = sharedPref.getString(USER_NAME, "no-user");
 
 		if (savedInstanceState == null) {
 			FragmentTransaction t = getFragmentManager().beginTransaction();
-			Fragment fragment = new UserFragment();
-			Bundle args = new Bundle();
-			args.putString(USER_NAME, user);
-			fragment.setArguments(args);
+			Fragment fragment = new UserSelectionFragment();
+			//Bundle args = new Bundle();
+			//fragment.setArguments(args);
 			t.add(R.id.container, fragment);
 			t.commit();
 		}
@@ -71,14 +74,26 @@ public class MainActivity extends Activity {
 	/**
 	 * A placeholder fragment containing a simple view.
 	 */
-	public static class UserFragment extends Fragment {
+	public static class UserSelectionFragment extends Fragment {
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_user, container, false);
-			Bundle args = getArguments();
-			((TextView) rootView.findViewById(R.id.user)).setText(args.getString(USER_NAME, "No User"));
+			View rootView = inflater.inflate(R.layout.fragment_user_list, container, false);
+
+			//Bundle args = getArguments();
+			SharedPreferences pref = getActivity().getPreferences(Context.MODE_PRIVATE);
+			Set<String> user_list = pref.getStringSet(USER_LIST, new HashSet<String>());
+			// Add the New User psuedo-user to the set. We can always add more users.
+			user_list.add(NEW_USER);
+			
+			// Create a button for each user.
+			for (Object user: user_list) {
+				Button button = new Button(getActivity());
+				button.setText((CharSequence) user);
+				//((ViewGroup) rootView).addView(button);//BUGBUG: THis is broken
+			}
+
 			return rootView;
 		}
 	}
