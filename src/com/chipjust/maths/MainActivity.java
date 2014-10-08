@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.os.Build;
@@ -80,6 +81,7 @@ public class MainActivity extends Activity {
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_user_list, container, false);
+			LinearLayout l = (LinearLayout) rootView.findViewById(R.id.linearlayout);
 
 			//Bundle args = getArguments();
 			SharedPreferences pref = getActivity().getPreferences(Context.MODE_PRIVATE);
@@ -91,7 +93,7 @@ public class MainActivity extends Activity {
 			for (Object user: user_list) {
 				Button button = new Button(getActivity());
 				button.setText((CharSequence) user);
-				//((ViewGroup) rootView).addView(button);//BUGBUG: THis is broken
+				l.addView(button);
 			}
 
 			return rootView;
