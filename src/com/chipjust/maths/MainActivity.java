@@ -13,10 +13,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -25,6 +27,8 @@ import android.widget.TextView;
 import android.os.Build;
 
 public class MainActivity extends Activity {
+	
+	private static final String TAG = "MainActivity";
 	
 	private static final String USER_LIST = "user_list";
 	private static final String NEW_USER = "New User";
@@ -71,10 +75,25 @@ public class MainActivity extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
+	
+	public static void addUser() {
+		
+	}
 
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
+	public static class UserButtonListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			Button b = (Button)v;
+		    String buttonText = b.getText().toString();
+			Log.v(TAG, String.format("onClick:%s", buttonText));
+			if (buttonText == NEW_USER) {
+				addUser();
+			}
+		}
+		
+	}
+
 	public static class UserSelectionFragment extends Fragment {
 
 		@Override
@@ -93,6 +112,7 @@ public class MainActivity extends Activity {
 			for (Object user: user_list) {
 				Button button = new Button(getActivity());
 				button.setText((CharSequence) user);
+				button.setOnClickListener(new UserButtonListener());
 				l.addView(button);
 			}
 
