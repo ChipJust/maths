@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -44,8 +45,6 @@ public class MainActivity extends Activity {
 		if (savedInstanceState == null) {
 			FragmentTransaction t = getFragmentManager().beginTransaction();
 			Fragment fragment = new UserSelectionFragment();
-			//Bundle args = new Bundle();
-			//fragment.setArguments(args);
 			t.add(R.id.container, fragment);
 			t.commit();
 		}
@@ -76,45 +75,83 @@ public class MainActivity extends Activity {
 		}
 	}
 	
-	public static void addUser() {
-		
-	}
-
-	public static class UserButtonListener implements View.OnClickListener {
-
-		@Override
-		public void onClick(View v) {
-			Button b = (Button)v;
-		    String buttonText = b.getText().toString();
-			Log.v(TAG, String.format("onClick:%s", buttonText));
-			if (buttonText == NEW_USER) {
-				addUser();
-			}
-		}
-		
-	}
-
 	public static class UserSelectionFragment extends Fragment {
+		public class UserButtonListener implements View.OnClickListener {
+
+			@Override
+			public void onClick(View v) {
+				Button b = (Button)v;
+			    String buttonText = b.getText().toString();
+				Log.v(TAG, String.format("onClick:%s", buttonText));
+				if (buttonText == NEW_USER) {
+					getFragmentManager().beginTransaction().replace(R.id.container, new NewUserFragment()).commit();
+				}
+			}
+			
+		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_user_list, container, false);
 			LinearLayout l = (LinearLayout) rootView.findViewById(R.id.linearlayout);
 
-			//Bundle args = getArguments();
 			SharedPreferences pref = getActivity().getPreferences(Context.MODE_PRIVATE);
 			Set<String> user_list = pref.getStringSet(USER_LIST, new HashSet<String>());
 			// Add the New User psuedo-user to the set. We can always add more users.
 			user_list.add(NEW_USER);
+			//NEWREL: Convert to list and sort.
 			
 			// Create a button for each user.
 			for (Object user: user_list) {
 				Button button = new Button(getActivity());
 				button.setText((CharSequence) user);
 				button.setOnClickListener(new UserButtonListener());
+				//NEWREL: Check to see if this button is for the currently selected user. If so, highlight it.
 				l.addView(button);
 			}
+
+			return rootView;
+		}
+	}
+	
+	public void createUserButtonClick (View view) {
+		Log.v(TAG, "createUserButtonClick");
+		EditText input = (EditText) findViewById(R.id.new_user_input);
+		String newUser = input.getText().toString();
+		
+		if (newUser == "") {
+			// NEWREL: Show error.
+			return;
+		}
+		if (newUser ==  NEW_USER) {
+			// NEWREL: Show error.
+			return;
+		}
+		
+		SharedPreferences pref = getPreferences(Context.MODE_PRIVATE);
+		Set<String> user_list = pref.getStringSet(USER_LIST, new HashSet<String>());
+		// NEWREL: Make case insensitive, but preserve case in the set.
+		
+		if (user_list.contains(newUser)) {
+			// NEWREL: Show error.
+			return;
+		}
+		
+		// Add the new user to the set of users.
+		user_list.add(newUser);
+		SharedPreferences.Editor editor = pref.edit();
+		editor.putStringSet(USER_LIST, user_list);
+		editor.commit();
+
+		// Transition back to the User Selection Screen.
+		getFragmentManager().beginTransaction().replace(R.id.container, new UserSelectionFragment()).commit();
+	}
+	
+	public static class NewUserFragment extends Fragment {
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+			View rootView = inflater.inflate(R.layout.fragment_new_user, container, false);
 
 			return rootView;
 		}

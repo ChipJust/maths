@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearlayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+	
+	<TextView 
+        android:id="@+id/input_message"
+        android:text="@string/input_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+	
+	<EditText
+	    android:id="@+id/new_user_input"
+	    android:hint="@string/new_user"
+	    android:inputType="textCapWords"
+	    android:singleLine="true"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content" />
+
+	<Button 
+        android:id="@+id/create_user_button"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:text="@string/create_user"
+        android:onClick="createUserButtonClick" />	
+
+	<TextView 
+        android:id="@+id/status_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
