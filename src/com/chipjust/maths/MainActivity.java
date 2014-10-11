@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.os.Build;
 
@@ -37,13 +38,15 @@ public class MainActivity extends Activity {
 	private static final String CURRENT_USER = "Current User";
 	private static final String COLOR_SELECTED_USER = "#D9E3B1";
 	
+	private static final String USER_PREFERNCE_MULTIPLICATION = "mult";
+	private static final String USER_PREFERNCE_DIVISION = "div";
+	private static final String USER_PREFERNCE_ADDITION = "add";
+	private static final String USER_PREFERNCE_SUBTRACTION = "sub";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
-		//SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-		//SharedPreferences.Editor editor = sharedPref.edit();
 
 		if (savedInstanceState == null) {
 			FragmentTransaction t = getFragmentManager().beginTransaction();
@@ -121,7 +124,7 @@ public class MainActivity extends Activity {
 				Button button = new Button(getActivity());
 				button.setText((CharSequence) user);
 				button.setOnClickListener(new UserButtonListener());
-				//NEWREL: Check to see if this button is for the currently selected user. If so, highlight it.
+				// Check to see if this button is for the currently selected user. If so, highlight it.
 				if (user.equals(currentUser)) {
 					//button.setBackground(getResources().getDrawable(R.drawable.button_border));
 					button.setBackgroundColor(Color.parseColor(COLOR_SELECTED_USER));
@@ -138,12 +141,13 @@ public class MainActivity extends Activity {
 		EditText input = (EditText) findViewById(R.id.new_user_input);
 		String newUser = input.getText().toString();
 		
+		TextView status = (TextView) findViewById(R.id.status_message);
 		if (newUser.equals("")) {
-			// NEWREL: Show error.
+			status.setText(R.string.blank_user_error);
 			return;
 		}
 		if (newUser.equals(NEW_USER)) {
-			// NEWREL: Show error.
+			status.setText(R.string.new_user_error);
 			return;
 		}
 		
@@ -152,7 +156,7 @@ public class MainActivity extends Activity {
 		// NEWREL: Make case insensitive, but preserve case in the set.
 		
 		if (user_list.contains(newUser)) {
-			// NEWREL: Show error.
+			status.setText(R.string.user_exists_error);
 			return;
 		}
 		
@@ -161,6 +165,14 @@ public class MainActivity extends Activity {
 		SharedPreferences.Editor editor = pref.edit();
 		editor.putStringSet(USER_LIST, user_list);
 		editor.commit();
+		
+		// Create the preferences file for this user.
+		SharedPreferences userPref = getSharedPreferences(newUser, Context.MODE_PRIVATE);
+		SharedPreferences.Editor userEditor = userPref.edit();
+		userEditor.putBoolean(USER_PREFERNCE_ADDITION, true);
+		userEditor.putBoolean(USER_PREFERNCE_DIVISION, true);
+		userEditor.putBoolean(USER_PREFERNCE_MULTIPLICATION, true);
+		userEditor.putBoolean(USER_PREFERNCE_SUBTRACTION, true);
 
 		// Transition back to the User Selection Screen.
 		getFragmentManager().beginTransaction().replace(R.id.container, new UserSelectionFragment()).commit();
@@ -183,25 +195,37 @@ public class MainActivity extends Activity {
 		
 		Log.v(TAG, String.format("deleteUserButtonClick:%s.", currentUser));
 		
-		user_list.remove(currentUser);//BUGBUG: need to find the user name, not the Delete User text that is this button...
+		user_list.remove(currentUser);
 		
 		SharedPreferences.Editor editor = pref.edit();
 		editor.putStringSet(USER_LIST, user_list);
 		editor.remove(CURRENT_USER);
 		editor.commit();
 		
-		//NEWREL: delete the users preferences file.
-		
 		// Transition back to the User Selection Screen.
 		getFragmentManager().beginTransaction().replace(R.id.container, new UserSelectionFragment()).commit();
 		return;
 	}
 	
+	public void userPreferncesRadioButtonsClick (View view){
+		String currentUser = getPreferences(Context.MODE_PRIVATE).getString(CURRENT_USER, "");
+		RadioButton b = (RadioButton) view;
+	    String bText = b.getText().toString();
+		boolean bChecked = b.isChecked();
+		Log.v(TAG, String.format("userPreferncesRadioButtonsClick:%s.%s.%b.", currentUser, bText, bChecked));
+		//NEWREL: Handle the button click.
+	}
+
 	public static class UserFragment extends Fragment {
 		
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_user, container, false);
+			String currentUser = getActivity().getPreferences(Context.MODE_PRIVATE).getString(CURRENT_USER, "");
+			TextView userName = (TextView) rootView.findViewById(R.id.user);
+			userName.setText(currentUser);
+			
+			//NEWREL: Set the values of the current user's preference to this form.
 			return rootView;
 		}
 	}

@@ -8,5 +8,8 @@
     <string name="new_user">New User</string>
     <string name="create_user">Create User</string>
     <string name="delete_user">Delete User</string>
+    <string name="blank_user_error">Can\'t add a blank string as user. Must be at least one character.</string>
+    <string name="new_user_error">Can\'t use the name \"New User\" for the user name.</string>
+    <string name="user_exists_error">This user name already exists. Choose another.</string>
     
 </resources>
