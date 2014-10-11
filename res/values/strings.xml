@@ -7,5 +7,6 @@
     <string name="input_message">Input New User Name</string>
     <string name="new_user">New User</string>
     <string name="create_user">Create User</string>
+    <string name="delete_user">Delete User</string>
     
 </resources>

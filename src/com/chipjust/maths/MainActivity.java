@@ -96,7 +96,8 @@ public class MainActivity extends Activity {
 				editor.putString(CURRENT_USER, buttonText);
 				editor.commit();
 				
-				//BUGBUG: Display the fragment for this user.
+				getFragmentManager().beginTransaction().replace(R.id.container, new UserFragment()).commit();
+				return;
 			}
 			
 		}
@@ -171,6 +172,36 @@ public class MainActivity extends Activity {
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_new_user, container, false);
+			return rootView;
+		}
+	}
+	
+	public void deleteUserButtonClick (View view) {
+		SharedPreferences pref = getPreferences(Context.MODE_PRIVATE);
+		Set<String> user_list = pref.getStringSet(USER_LIST, new HashSet<String>());
+		String currentUser = pref.getString(CURRENT_USER, "");
+		
+		Log.v(TAG, String.format("deleteUserButtonClick:%s.", currentUser));
+		
+		user_list.remove(currentUser);//BUGBUG: need to find the user name, not the Delete User text that is this button...
+		
+		SharedPreferences.Editor editor = pref.edit();
+		editor.putStringSet(USER_LIST, user_list);
+		editor.remove(CURRENT_USER);
+		editor.commit();
+		
+		//NEWREL: delete the users preferences file.
+		
+		// Transition back to the User Selection Screen.
+		getFragmentManager().beginTransaction().replace(R.id.container, new UserSelectionFragment()).commit();
+		return;
+	}
+	
+	public static class UserFragment extends Fragment {
+		
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+			View rootView = inflater.inflate(R.layout.fragment_user, container, false);
 			return rootView;
 		}
 	}
