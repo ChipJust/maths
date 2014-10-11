@@ -23,4 +23,32 @@
         android:layout_alignParentBottom="true"
         android:onClick="deleteUserButtonClick" />	
 
+    <CheckBox android:id="@+id/cb_multiplication"
+        android:layout_above="@id/delete_user_button"
+   	    android:layout_width="wrap_content"
+   	    android:layout_height="wrap_content"
+   	    android:text="@string/multiplication"
+   	    android:onClick="userPreferncesCheckBoxClick"/>
+
+    <CheckBox android:id="@+id/cb_division"
+        android:layout_above="@id/cb_multiplication"
+   	    android:layout_width="wrap_content"
+   	    android:layout_height="wrap_content"
+   	    android:text="@string/division"
+   	    android:onClick="userPreferncesCheckBoxClick"/>
+    
+    <CheckBox android:id="@+id/cb_subtraction"
+        android:layout_above="@id/cb_division"
+   	    android:layout_width="wrap_content"
+   	    android:layout_height="wrap_content"
+   	    android:text="@string/subtraction"
+   	    android:onClick="userPreferncesCheckBoxClick"/>
+    
+    <CheckBox android:id="@+id/cb_addition"
+        android:layout_above="@id/cb_subtraction"
+   	    android:layout_width="wrap_content"
+   	    android:layout_height="wrap_content"
+   	    android:text="@string/addition"
+   	    android:onClick="userPreferncesCheckBoxClick"/>
+        
 </RelativeLayout>

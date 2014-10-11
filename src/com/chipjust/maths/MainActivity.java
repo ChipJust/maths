@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -207,12 +208,12 @@ public class MainActivity extends Activity {
 		return;
 	}
 	
-	public void userPreferncesRadioButtonsClick (View view){
+	public void userPreferncesCheckBoxClick (View view){
 		String currentUser = getPreferences(Context.MODE_PRIVATE).getString(CURRENT_USER, "");
-		RadioButton b = (RadioButton) view;
+		CheckBox b = (CheckBox) view;
 	    String bText = b.getText().toString();
 		boolean bChecked = b.isChecked();
-		Log.v(TAG, String.format("userPreferncesRadioButtonsClick:%s.%s.%b.", currentUser, bText, bChecked));
+		Log.v(TAG, String.format("userPreferncesCheckBoxClick:%s.%s.%b.", currentUser, bText, bChecked));
 		//NEWREL: Handle the button click.
 	}
 

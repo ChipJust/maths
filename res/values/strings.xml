@@ -11,5 +11,9 @@
     <string name="blank_user_error">Can\'t add a blank string as user. Must be at least one character.</string>
     <string name="new_user_error">Can\'t use the name \"New User\" for the user name.</string>
     <string name="user_exists_error">This user name already exists. Choose another.</string>
+    <string name="multiplication">Multiplication</string>
+    <string name="division">Division</string>
+    <string name="subtraction">Subtraction</string>
+    <string name="addition">Addition</string>
     
 </resources>
