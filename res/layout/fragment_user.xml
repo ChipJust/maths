@@ -7,14 +7,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.chipjust.maths.MainActivity$UserFragment" >
-
-    <TextView
-        android:id="@+id/user"
-        android:layout_alignParentTop="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"  />
-
-    
+   
     <Button 
         android:id="@+id/delete_user_button"
         android:layout_height="wrap_content"
@@ -23,32 +16,12 @@
         android:layout_alignParentBottom="true"
         android:onClick="deleteUserButtonClick" />	
 
-    <CheckBox android:id="@+id/cb_multiplication"
-        android:layout_above="@id/delete_user_button"
-   	    android:layout_width="wrap_content"
-   	    android:layout_height="wrap_content"
-   	    android:text="@string/multiplication"
-   	    android:onClick="userPreferncesCheckBoxClick"/>
+    <LinearLayout
+	    android:id="@+id/userPreferencesLinearLayout"
+	    android:layout_above="@id/delete_user_button"
+    	android:layout_width="match_parent"
+    	android:layout_height="match_parent"
+    	android:orientation="vertical" >
+	</LinearLayout>
 
-    <CheckBox android:id="@+id/cb_division"
-        android:layout_above="@id/cb_multiplication"
-   	    android:layout_width="wrap_content"
-   	    android:layout_height="wrap_content"
-   	    android:text="@string/division"
-   	    android:onClick="userPreferncesCheckBoxClick"/>
-    
-    <CheckBox android:id="@+id/cb_subtraction"
-        android:layout_above="@id/cb_division"
-   	    android:layout_width="wrap_content"
-   	    android:layout_height="wrap_content"
-   	    android:text="@string/subtraction"
-   	    android:onClick="userPreferncesCheckBoxClick"/>
-    
-    <CheckBox android:id="@+id/cb_addition"
-        android:layout_above="@id/cb_subtraction"
-   	    android:layout_width="wrap_content"
-   	    android:layout_height="wrap_content"
-   	    android:text="@string/addition"
-   	    android:onClick="userPreferncesCheckBoxClick"/>
-        
 </RelativeLayout>

@@ -1,6 +1,7 @@
 package com.chipjust.maths;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import com.chipjust.maths.Quiz.QuestionFragment;
@@ -83,7 +84,8 @@ public class MainActivity extends Activity {
 	}
 	
 	public static class UserSelectionFragment extends Fragment {
-		public class UserButtonListener implements View.OnClickListener {
+		
+		public class UserSelectionFragmentListener implements View.OnClickListener {
 
 			@Override
 			public void onClick(View v) {
@@ -124,7 +126,7 @@ public class MainActivity extends Activity {
 			for (Object user: user_list) {
 				Button button = new Button(getActivity());
 				button.setText((CharSequence) user);
-				button.setOnClickListener(new UserButtonListener());
+				button.setOnClickListener(new UserSelectionFragmentListener());
 				// Check to see if this button is for the currently selected user. If so, highlight it.
 				if (user.equals(currentUser)) {
 					//button.setBackground(getResources().getDrawable(R.drawable.button_border));
@@ -161,12 +163,6 @@ public class MainActivity extends Activity {
 			return;
 		}
 		
-		// Add the new user to the set of users.
-		user_list.add(newUser);
-		SharedPreferences.Editor editor = pref.edit();
-		editor.putStringSet(USER_LIST, user_list);
-		editor.commit();
-		
 		// Create the preferences file for this user.
 		SharedPreferences userPref = getSharedPreferences(newUser, Context.MODE_PRIVATE);
 		SharedPreferences.Editor userEditor = userPref.edit();
@@ -174,7 +170,14 @@ public class MainActivity extends Activity {
 		userEditor.putBoolean(USER_PREFERNCE_DIVISION, true);
 		userEditor.putBoolean(USER_PREFERNCE_MULTIPLICATION, true);
 		userEditor.putBoolean(USER_PREFERNCE_SUBTRACTION, true);
+		userEditor.commit();
 
+		// Add the new user to the set of users.
+		user_list.add(newUser);
+		SharedPreferences.Editor editor = pref.edit();
+		editor.putStringSet(USER_LIST, user_list);
+		editor.commit();
+		
 		// Transition back to the User Selection Screen.
 		getFragmentManager().beginTransaction().replace(R.id.container, new UserSelectionFragment()).commit();
 		return;
@@ -208,25 +211,42 @@ public class MainActivity extends Activity {
 		return;
 	}
 	
-	public void userPreferncesCheckBoxClick (View view){
-		String currentUser = getPreferences(Context.MODE_PRIVATE).getString(CURRENT_USER, "");
-		CheckBox b = (CheckBox) view;
-	    String bText = b.getText().toString();
-		boolean bChecked = b.isChecked();
-		Log.v(TAG, String.format("userPreferncesCheckBoxClick:%s.%s.%b.", currentUser, bText, bChecked));
-		//NEWREL: Handle the button click.
-	}
-
 	public static class UserFragment extends Fragment {
+		
+		public class UserFragmentListener implements View.OnClickListener {
+
+			@Override
+			public void onClick(View view) {
+				Activity activity = getActivity();
+				String currentUser = activity.getPreferences(Context.MODE_PRIVATE).getString(CURRENT_USER, "");
+				CheckBox b = (CheckBox) view;
+			    String bText = b.getText().toString();
+				boolean bChecked = b.isChecked();
+				Log.v(TAG, String.format("userPreferncesCheckBoxClick:%s.%s.%b.", currentUser, bText, bChecked));
+				SharedPreferences.Editor userEditor = activity.getSharedPreferences(currentUser, Context.MODE_PRIVATE).edit();
+				userEditor.putBoolean(bText, bChecked);
+				userEditor.commit();
+			}
+		}
 		
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_user, container, false);
 			String currentUser = getActivity().getPreferences(Context.MODE_PRIVATE).getString(CURRENT_USER, "");
-			TextView userName = (TextView) rootView.findViewById(R.id.user);
-			userName.setText(currentUser);
+			LinearLayout l = (LinearLayout) rootView.findViewById(R.id.userPreferencesLinearLayout);
+			Activity activity = getActivity();
 			
-			//NEWREL: Set the values of the current user's preference to this form.
+			SharedPreferences userPref = activity.getSharedPreferences(currentUser, Context.MODE_PRIVATE);
+			Map<String,?> keys = userPref.getAll();
+			// NEWREL: Need to sort these somehow.
+			for(Map.Entry<String,?> entry : keys.entrySet()) {
+				CheckBox b = new CheckBox(activity);
+				b.setText((CharSequence) entry.getKey());
+				b.setOnClickListener(new UserFragmentListener());
+				b.setChecked((Boolean) entry.getValue());
+				l.addView(b);
+			}
+			
 			return rootView;
 		}
 	}
