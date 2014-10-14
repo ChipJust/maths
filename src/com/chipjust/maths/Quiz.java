@@ -2,7 +2,6 @@ package com.chipjust.maths;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +10,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.graphics.Color;
@@ -25,17 +23,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class Quiz extends Activity {
-	
-	private static final String TAG = "QuizActivity";
+public class Quiz extends MathsActivity {
 	
 	// args for the fragment
 	private static final String QUESTION = "question";
 	private static final String BUTTONS = "buttons";
 	private Map<Integer, Integer> buttons;
 	
-	private static final List<String> operators = Arrays.asList("+", "-", "x", "/");
-	private static final List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
 	private int operand1 = 0;
 	private int operand2 = 0;
 	private String operator = "?";

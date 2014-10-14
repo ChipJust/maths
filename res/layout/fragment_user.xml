@@ -15,13 +15,16 @@
         android:text="@string/delete_user"
         android:layout_alignParentBottom="true"
         android:onClick="deleteUserButtonClick" />	
-
-    <LinearLayout
-	    android:id="@+id/userPreferencesLinearLayout"
-	    android:layout_above="@id/delete_user_button"
+    <ScrollView 
+        android:layout_above="@id/delete_user_button"
     	android:layout_width="match_parent"
-    	android:layout_height="match_parent"
-    	android:orientation="vertical" >
-	</LinearLayout>
+    	android:layout_height="match_parent" >
+	    <LinearLayout
+		    android:id="@+id/userPreferencesLinearLayout"
+	    	android:orientation="vertical"
+	    	android:layout_width="match_parent"
+	    	android:layout_height="wrap_content"  >
+		</LinearLayout>
+	</ScrollView>
 
 </RelativeLayout>

@@ -3,11 +3,9 @@ package com.chipjust.maths;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import com.chipjust.maths.Quiz.QuestionFragment;
+import java.util.TreeMap;
 
 import android.app.Activity;
-import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
@@ -20,20 +18,14 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.RadioButton;
 import android.widget.TextView;
-import android.os.Build;
 
-public class MainActivity extends Activity {
-	
-	private static final String TAG = "MainActivity";
+public class MainActivity extends MathsActivity {
 	
 	private static final String USER_LIST = "user_list";
 	private static final String NEW_USER = "New User";
@@ -166,10 +158,12 @@ public class MainActivity extends Activity {
 		// Create the preferences file for this user.
 		SharedPreferences userPref = getSharedPreferences(newUser, Context.MODE_PRIVATE);
 		SharedPreferences.Editor userEditor = userPref.edit();
-		userEditor.putBoolean(USER_PREFERNCE_ADDITION, true);
-		userEditor.putBoolean(USER_PREFERNCE_DIVISION, true);
-		userEditor.putBoolean(USER_PREFERNCE_MULTIPLICATION, true);
-		userEditor.putBoolean(USER_PREFERNCE_SUBTRACTION, true);
+		for (String op : operators) {
+			userEditor.putBoolean(op, true);
+		}
+		for (Integer num : numbers) {
+			userEditor.putBoolean(num.toString(), true);
+		}
 		userEditor.commit();
 
 		// Add the new user to the set of users.
@@ -238,8 +232,8 @@ public class MainActivity extends Activity {
 			
 			SharedPreferences userPref = activity.getSharedPreferences(currentUser, Context.MODE_PRIVATE);
 			Map<String,?> keys = userPref.getAll();
-			// NEWREL: Need to sort these somehow.
-			for(Map.Entry<String,?> entry : keys.entrySet()) {
+			Map<String, Boolean> sortedKeys = new TreeMap<String, Boolean>((Map<String, Boolean>) keys);
+			for(Map.Entry<String,?> entry : sortedKeys.entrySet()) {
 				CheckBox b = new CheckBox(activity);
 				b.setText((CharSequence) entry.getKey());
 				b.setOnClickListener(new UserFragmentListener());
