@@ -32,11 +32,6 @@ public class MainActivity extends MathsActivity {
 	private static final String CURRENT_USER = "Current User";
 	private static final String COLOR_SELECTED_USER = "#D9E3B1";
 	
-	private static final String USER_PREFERNCE_MULTIPLICATION = "mult";
-	private static final String USER_PREFERNCE_DIVISION = "div";
-	private static final String USER_PREFERNCE_ADDITION = "add";
-	private static final String USER_PREFERNCE_SUBTRACTION = "sub";
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -68,7 +63,7 @@ public class MainActivity extends MathsActivity {
 			startActivity(new Intent(this, Settings.class));
 			return true;
 		case R.id.action_quiz:
-			startActivity(new Intent(this, Quiz.class));
+			startActivity(new Intent(this, QuizActivity.class));
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -94,7 +89,7 @@ public class MainActivity extends MathsActivity {
 				editor.putString(CURRENT_USER, buttonText);
 				editor.commit();
 				
-				getFragmentManager().beginTransaction().replace(R.id.container, new UserFragment()).commit();
+				getFragmentManager().beginTransaction().replace(R.id.container, new UserFragment()).addToBackStack(null).commit();
 				return;
 			}
 			
@@ -233,13 +228,16 @@ public class MainActivity extends MathsActivity {
 			SharedPreferences userPref = activity.getSharedPreferences(currentUser, Context.MODE_PRIVATE);
 			Map<String,?> keys = userPref.getAll();
 			Map<String, Boolean> sortedKeys = new TreeMap<String, Boolean>((Map<String, Boolean>) keys);
-			for(Map.Entry<String,?> entry : sortedKeys.entrySet()) {
+			// NEWREL: the operators should be in there separately from the numbers.
+			for(Map.Entry<String, Boolean> entry : sortedKeys.entrySet()) {
 				CheckBox b = new CheckBox(activity);
 				b.setText((CharSequence) entry.getKey());
 				b.setOnClickListener(new UserFragmentListener());
-				b.setChecked((Boolean) entry.getValue());
+				b.setChecked(entry.getValue());
 				l.addView(b);
 			}
+			
+			// NEWREL: display the score.
 			
 			return rootView;
 		}

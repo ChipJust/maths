@@ -23,7 +23,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class Quiz extends MathsActivity {
+public class QuizActivity extends MathsActivity {
 	
 	// args for the fragment
 	private static final String QUESTION = "question";

@@ -26,7 +26,7 @@
             android:name="Settings"
             android:label="@string/action_settings" />
         <activity
-            android:name="Quiz"
+            android:name="QuizActivity"
             android:label="@string/action_quiz" />
         </application>
 
