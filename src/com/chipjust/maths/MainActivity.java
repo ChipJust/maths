@@ -226,14 +226,19 @@ public class MainActivity extends MathsActivity {
 			Activity activity = getActivity();
 			
 			SharedPreferences userPref = activity.getSharedPreferences(currentUser, Context.MODE_PRIVATE);
-			Map<String,?> keys = userPref.getAll();
-			Map<String, Boolean> sortedKeys = new TreeMap<String, Boolean>((Map<String, Boolean>) keys);
-			// NEWREL: the operators should be in there separately from the numbers.
-			for(Map.Entry<String, Boolean> entry : sortedKeys.entrySet()) {
+			for(String op : operators) {
 				CheckBox b = new CheckBox(activity);
-				b.setText((CharSequence) entry.getKey());
+				b.setText((CharSequence) op);
 				b.setOnClickListener(new UserFragmentListener());
-				b.setChecked(entry.getValue());
+				b.setChecked(userPref.getBoolean(op, true));
+				l.addView(b);
+			}
+			for(Integer i : numbers) {
+				CheckBox b = new CheckBox(activity);
+				String num = i.toString();
+				b.setText((CharSequence) num);
+				b.setOnClickListener(new UserFragmentListener());
+				b.setChecked(userPref.getBoolean(num, true));
 				l.addView(b);
 			}
 			
