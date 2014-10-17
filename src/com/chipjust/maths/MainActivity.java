@@ -29,7 +29,6 @@ public class MainActivity extends MathsActivity {
 	
 	private static final String USER_LIST = "user_list";
 	private static final String NEW_USER = "New User";
-	private static final String CURRENT_USER = "Current User";
 	private static final String COLOR_SELECTED_USER = "#D9E3B1";
 	
 	@Override
@@ -85,7 +84,7 @@ public class MainActivity extends MathsActivity {
 				}
 
 				// Change the current user to this user.
-				SharedPreferences.Editor editor = getActivity().getPreferences(Context.MODE_PRIVATE).edit();
+				SharedPreferences.Editor editor = getActivity().getSharedPreferences(USERS_FILE, Context.MODE_PRIVATE).edit();
 				editor.putString(CURRENT_USER, buttonText);
 				editor.commit();
 				
@@ -100,7 +99,7 @@ public class MainActivity extends MathsActivity {
 			View rootView = inflater.inflate(R.layout.fragment_user_list, container, false);
 			LinearLayout l = (LinearLayout) rootView.findViewById(R.id.linearlayout);
 
-			SharedPreferences pref = getActivity().getPreferences(Context.MODE_PRIVATE);
+			SharedPreferences pref = getActivity().getSharedPreferences(USERS_FILE, Context.MODE_PRIVATE);
 			Set<String> user_list = pref.getStringSet(USER_LIST, new HashSet<String>());
 			
 			// Add the New User psuedo-user to the set. We can always add more users.
@@ -141,7 +140,7 @@ public class MainActivity extends MathsActivity {
 			return;
 		}
 		
-		SharedPreferences pref = getPreferences(Context.MODE_PRIVATE);
+		SharedPreferences pref = getSharedPreferences(USERS_FILE, Context.MODE_PRIVATE);
 		Set<String> user_list = pref.getStringSet(USER_LIST, new HashSet<String>());
 		// NEWREL: Make case insensitive, but preserve case in the set.
 		
@@ -182,7 +181,7 @@ public class MainActivity extends MathsActivity {
 	}
 	
 	public void deleteUserButtonClick (View view) {
-		SharedPreferences pref = getPreferences(Context.MODE_PRIVATE);
+		SharedPreferences pref = getSharedPreferences(USERS_FILE, Context.MODE_PRIVATE);
 		Set<String> user_list = pref.getStringSet(USER_LIST, new HashSet<String>());
 		String currentUser = pref.getString(CURRENT_USER, "");
 		
@@ -207,7 +206,7 @@ public class MainActivity extends MathsActivity {
 			@Override
 			public void onClick(View view) {
 				Activity activity = getActivity();
-				String currentUser = activity.getPreferences(Context.MODE_PRIVATE).getString(CURRENT_USER, "");
+				String currentUser = activity.getSharedPreferences(USERS_FILE, Context.MODE_PRIVATE).getString(CURRENT_USER, "");
 				CheckBox b = (CheckBox) view;
 			    String bText = b.getText().toString();
 				boolean bChecked = b.isChecked();
@@ -221,7 +220,7 @@ public class MainActivity extends MathsActivity {
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_user, container, false);
-			String currentUser = getActivity().getPreferences(Context.MODE_PRIVATE).getString(CURRENT_USER, "");
+			String currentUser = getActivity().getSharedPreferences(USERS_FILE, Context.MODE_PRIVATE).getString(CURRENT_USER, "");
 			LinearLayout l = (LinearLayout) rootView.findViewById(R.id.userPreferencesLinearLayout);
 			Activity activity = getActivity();
 			

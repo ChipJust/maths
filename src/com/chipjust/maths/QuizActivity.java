@@ -12,6 +12,8 @@ import java.util.Set;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -103,24 +105,38 @@ public class QuizActivity extends MathsActivity {
 		List<Integer> wrongAnswersList = new ArrayList<Integer>();
 		wrongAnswersList.addAll(wrongAnswers);
 		Collections.shuffle(wrongAnswersList);
+		//BUGBUG:Check to see if the list is long enough
 		wrongAnswersList.subList(numberOfWrongAnswers, wrongAnswersList.size()).clear();	
 		return wrongAnswersList;
 	}
 	
 	private Bundle setNewQuestion() {
 		Random rand = new Random();
-
-		// NEWREL:we could filter the list of operands by the user preferences
-		// NEWREL:we could filter the list of numbers by the user preferences
+		//NEWREL: move these to the class
+		String currentUser = getSharedPreferences(USERS_FILE, Context.MODE_PRIVATE).getString(CURRENT_USER, "");
+		SharedPreferences userPref = getSharedPreferences(currentUser, Context.MODE_PRIVATE);
+		Log.v(TAG, String.format("setNewQuestion for %s", currentUser));
 
 		// Operator
 		List<String> myOperators = new ArrayList<String>();
-		myOperators.addAll(operators);
+		for (String op : operators) {
+			if (userPref.getBoolean(op, true)) {
+				myOperators.add(op);
+			}
+		}
+		//BUGBUG: what if there are no operators selected?
 		operator = myOperators.get(rand.nextInt(myOperators.size()));
 		
 		// Operands
-		int num1 =  numbers.get(rand.nextInt(numbers.size()));
-		int num2 =  numbers.get(rand.nextInt(numbers.size()));
+		List<Integer> myNumbers = new ArrayList<Integer>();
+		for (Integer i : numbers) {
+			if (userPref.getBoolean(i.toString(), true)) {
+				myNumbers.add(i);
+			}
+		}
+		//BUGBUG: What if there are no numbers selected?
+		int num1 =  myNumbers.get(rand.nextInt(myNumbers.size()));
+		int num2 =  myNumbers.get(rand.nextInt(myNumbers.size()));
 		switch (operator) {
 		case "/":
 			operand1 = num1 * num2;
