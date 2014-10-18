@@ -15,6 +15,6 @@ public class MathsActivity extends Activity {
 
 	protected static final String CURRENT_USER = "Current User";
 	
-	protected static final long quizTime = 10000; // NEWREL: this needs to be configurable.
+	protected static final long quizTime = 60000; // NEWREL: this needs to be configurable.
 
 }

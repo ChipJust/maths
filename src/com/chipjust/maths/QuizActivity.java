@@ -29,10 +29,16 @@ import android.widget.TextView;
 
 public class QuizActivity extends MathsActivity {
 	
-	// args for the fragment
+	// args for the QuestionFragment
 	private static final String QUESTION = "question";
 	private static final String BUTTONS = "buttons";
 	private Map<Integer, Integer> buttons;
+	
+	// args for the ScoreFragment
+	private static final String SCORE = "score";
+	private static final String QUESTION_COUNT = "question-count";
+	private static final String CORRECT_COUNT = "correct-count";
+	private static final String QUIZ_TIME = "quiz-time";
 	
 	private int operand1 = 0;
 	private int operand2 = 0;
@@ -75,6 +81,8 @@ public class QuizActivity extends MathsActivity {
 		buttons = new HashMap<Integer, Integer>();
 		quizTimeRemaining = quizTime;
 		score = 0;
+		questionCount= 0;
+		correctCount = 0;
 		if (savedInstanceState == null) {
 			newQuestion();
 		}
@@ -189,13 +197,13 @@ public class QuizActivity extends MathsActivity {
 	private void updateScore(long elapsedTime, boolean correct) {
 		questionCount += 1;
 		if (correct) {
-			if (elapsedTime < 400) {
+			if (elapsedTime < 1200) {
 				score += 5;
-			} else if (elapsedTime < 800) {
+			} else if (elapsedTime < 2400) {
 				score += 4;
-			} else if (elapsedTime < 1600) {
+			} else if (elapsedTime < 3600) {
 				score += 3;
-			} else if (elapsedTime < 3200) {
+			} else if (elapsedTime < 4800) {
 				score += 2;
 			} else {
 				score += 1;
@@ -208,18 +216,23 @@ public class QuizActivity extends MathsActivity {
 	}
 
 	private void newQuestion() {
-		FragmentTransaction t = getFragmentManager().beginTransaction();
 		Fragment fragment = new QuestionFragment();
 		Bundle args = setNewQuestion();
 		fragment.setArguments(args);
-		t.replace(R.id.container, fragment);
-		t.commit();
-		clicked = false;
+		getFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
 		questionStart = SystemClock.uptimeMillis ();
+		clicked = false;
 	}
 	
 	private void showScore() {
-		getFragmentManager().beginTransaction().replace(R.id.container, new ScoreFragment()).commit();
+		Fragment fragment = new ScoreFragment();
+		Bundle args = new Bundle();
+		args.putInt(QUESTION_COUNT, questionCount);
+		args.putInt(CORRECT_COUNT, correctCount);
+		args.putInt(SCORE, score);
+		args.putInt(QUIZ_TIME, (int) quizTime);
+		fragment.setArguments(args);
+		getFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
 	}
 
 	// There is only one handler for all the question buttons.
@@ -274,6 +287,22 @@ public class QuizActivity extends MathsActivity {
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_score, container, false);
+			Bundle args = getArguments();
+			TextView scoreView = (TextView) rootView.findViewById(R.id.score);
+			int score = args.getInt(SCORE);
+			int quizTime = args.getInt(QUIZ_TIME);
+			int questionCount = args.getInt(QUESTION_COUNT);
+			int correctCount = args.getInt(CORRECT_COUNT);
+			String text =  String.format(
+					"Score: %d\n"+
+					"Percent Correct: %3.0f%%   Count: %d   Correct: %d\n"+
+					"Points per Second: %.1f\n", 
+					score, 
+					(float) correctCount * 100 / (float) questionCount,
+					questionCount, 
+					correctCount,
+					(float) score * 1000 / (float) quizTime);
+			scoreView.setText((CharSequence) text);
 			return rootView;
 		}
 	}
