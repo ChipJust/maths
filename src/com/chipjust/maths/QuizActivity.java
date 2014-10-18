@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import com.chipjust.maths.MainActivity.UserSelectionFragment;
+
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
@@ -47,19 +49,32 @@ public class QuizActivity extends MathsActivity {
 	
 	Handler handler;
 	Runnable runNewQuestion;
+	Runnable runShowScore;
 	
 	long questionStart;
+	long quizTimeRemaining;
+	
+	int score;
+	int questionCount;
+	int correctCount;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		// BUGBUG: I am pretty sure that I am not handling savedInstanceState correctly. Try changing to landscape during a quiz.
 		handler = new Handler();
 		runNewQuestion = new Runnable() {
 			public void run () {
 				newQuestion();
 			}};
+		runShowScore = new Runnable() {
+			public void run () {
+				showScore();
+			}};
 		buttons = new HashMap<Integer, Integer>();
+		quizTimeRemaining = quizTime;
+		score = 0;
 		if (savedInstanceState == null) {
 			newQuestion();
 		}
@@ -115,7 +130,6 @@ public class QuizActivity extends MathsActivity {
 		//NEWREL: move these to the class
 		String currentUser = getSharedPreferences(USERS_FILE, Context.MODE_PRIVATE).getString(CURRENT_USER, "");
 		SharedPreferences userPref = getSharedPreferences(currentUser, Context.MODE_PRIVATE);
-		Log.v(TAG, String.format("setNewQuestion for %s", currentUser));
 
 		// Operator
 		List<String> myOperators = new ArrayList<String>();
@@ -171,6 +185,27 @@ public class QuizActivity extends MathsActivity {
 		args.putSerializable(BUTTONS, (Serializable) buttons);
 		return args;
 	}
+	
+	private void updateScore(long elapsedTime, boolean correct) {
+		questionCount += 1;
+		if (correct) {
+			if (elapsedTime < 400) {
+				score += 5;
+			} else if (elapsedTime < 800) {
+				score += 4;
+			} else if (elapsedTime < 1600) {
+				score += 3;
+			} else if (elapsedTime < 3200) {
+				score += 2;
+			} else {
+				score += 1;
+			}
+			correctCount += 1;
+		} else {
+			score -= 1;
+		}
+		Log.v(TAG, String.format("updateScore(%d, %b): questionCount=%d, correctCount=%d, score=%d", elapsedTime, correct, questionCount, correctCount, score));
+	}
 
 	private void newQuestion() {
 		FragmentTransaction t = getFragmentManager().beginTransaction();
@@ -183,14 +218,21 @@ public class QuizActivity extends MathsActivity {
 		questionStart = SystemClock.uptimeMillis ();
 	}
 	
+	private void showScore() {
+		getFragmentManager().beginTransaction().replace(R.id.container, new ScoreFragment()).commit();
+	}
+
 	// There is only one handler for all the question buttons.
 	public void buttonClick (View view) {
 		if (clicked) {
 			return;
 		}
 		clicked = true; // no more clicks
-		// NEWREL: stop the timer
+		long elapsedTime = SystemClock.uptimeMillis () - questionStart;
+		Log.v(TAG, String.format("elapsed:%dms remaining:%dms", elapsedTime, quizTimeRemaining));
+
 		Integer userAnswer = buttons.get(view.getId());
+		updateScore (elapsedTime, (answer == userAnswer));
 		if (answer == userAnswer) {
 			view.setBackgroundColor(Color.parseColor(COLOR_GREEN));
 		} else {
@@ -204,10 +246,14 @@ public class QuizActivity extends MathsActivity {
 			}
 		}
 		// NEWREL: log the question, answer, userAnswer and time-consumed-on-this-question in history
-		long elapsedTime = SystemClock.uptimeMillis () - questionStart;
-		Log.v(TAG, String.format("%dms", elapsedTime));
-		// NEWREL: calculate time remaining and only run the next question if there is time remaining
-		handler.postDelayed(runNewQuestion, 750); // NEWREL: make this delay configurable in user preferences
+		if (quizTimeRemaining > elapsedTime) {
+			quizTimeRemaining -= elapsedTime;
+			handler.postDelayed(runNewQuestion, 750); // NEWREL: make this delay configurable in user preferences
+			return;
+		}
+		
+		// Out of time, report the results.
+		handler.postDelayed(runShowScore, 750); // NEWREL: make this delay configurable in user preferences
 	}
 
 	public static class QuestionFragment extends Fragment {
@@ -220,6 +266,14 @@ public class QuizActivity extends MathsActivity {
 			for (Object button : buttonMap.keySet()) {
 				((Button) rootView.findViewById((int) button)).setText(String.format("%d", buttonMap.get(button)));
 			}
+			return rootView;
+		}
+	}
+	
+	public static class ScoreFragment extends Fragment {
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+			View rootView = inflater.inflate(R.layout.fragment_score, container, false);
 			return rootView;
 		}
 	}

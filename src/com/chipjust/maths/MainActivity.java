@@ -58,9 +58,6 @@ public class MainActivity extends MathsActivity {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		switch (id) {
-		case R.id.action_settings:
-			startActivity(new Intent(this, Settings.class));
-			return true;
 		case R.id.action_quiz:
 			startActivity(new Intent(this, QuizActivity.class));
 			return true;
@@ -139,6 +136,7 @@ public class MainActivity extends MathsActivity {
 			status.setText(R.string.new_user_error);
 			return;
 		}
+		//NEWREL: Limit the length of the user name
 		
 		SharedPreferences pref = getSharedPreferences(USERS_FILE, Context.MODE_PRIVATE);
 		Set<String> user_list = pref.getStringSet(USER_LIST, new HashSet<String>());

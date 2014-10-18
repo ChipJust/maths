@@ -23,9 +23,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="Settings"
-            android:label="@string/action_settings" />
-        <activity
             android:name="QuizActivity"
             android:label="@string/action_quiz" />
         </application>
