@@ -37,10 +37,7 @@ public class MainActivity extends MathsActivity {
 		setContentView(R.layout.activity_main);
 
 		if (savedInstanceState == null) {
-			FragmentTransaction t = getFragmentManager().beginTransaction();
-			Fragment fragment = new UserSelectionFragment();
-			t.add(R.id.container, fragment);
-			t.commit();
+			getFragmentManager().beginTransaction().replace(R.id.container, new MainFragment()).addToBackStack(null).commit();
 		}
 	}
 
@@ -63,6 +60,33 @@ public class MainActivity extends MathsActivity {
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
+		}
+	}
+	
+	public void mainButtonClick (View view) {
+		Log.v(TAG, "mainButtonClick");
+		switch (view.getId()) {
+		case R.id.select_user:
+			getFragmentManager().beginTransaction().replace(R.id.container, new UserSelectionFragment()).addToBackStack(null).commit();
+			return;
+		case R.id.select_quiz:
+			break;
+		case R.id.user_stats:
+			break;
+		default:
+			break;
+		}
+	}
+	
+	public static class MainFragment extends Fragment {
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+			View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+			String currentUser = getActivity().getSharedPreferences(USERS_FILE, Context.MODE_PRIVATE).getString(CURRENT_USER, "No User Selected");
+			((TextView) rootView.findViewById(R.id.current_user)).setText(currentUser);
+			String currentQuiz = getActivity().getSharedPreferences(USERS_FILE, Context.MODE_PRIVATE).getString(CURRENT_QUIZ, "No Quiz Selected");
+			((TextView) rootView.findViewById(R.id.current_quiz)).setText(currentQuiz);
+			return rootView;
 		}
 	}
 	

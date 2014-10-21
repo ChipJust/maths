@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <TextView
+        android:id="@+id/current_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
+    <TextView 
+        android:id="@+id/current_quiz"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
+    <Button 
+        android:id="@+id/select_user"
+        android:text="@string/select_user"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:onClick="mainButtonClick" />
+    
+    <Button 
+        android:id="@+id/select_quiz"
+        android:text="@string/select_quiz"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:onClick="mainButtonClick" />
+    
+    <Button 
+        android:id="@+id/user_stats"
+        android:text="@string/user_stats"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:onClick="mainButtonClick" />
+    
+    
+</LinearLayout>
