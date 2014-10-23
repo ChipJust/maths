@@ -2,14 +2,11 @@ package com.chipjust.maths;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -90,7 +87,7 @@ public class MainActivity extends MathsActivity {
 			View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 			String currentUser = getActivity().getSharedPreferences(USERS_FILE, Context.MODE_PRIVATE).getString(CURRENT_USER, "No User Selected");
 			((TextView) rootView.findViewById(R.id.current_user)).setText(currentUser);
-			String currentQuiz = getActivity().getSharedPreferences(QUIZES_FILE, Context.MODE_PRIVATE).getString(CURRENT_QUIZ, "");
+			String currentQuiz = getActivity().getSharedPreferences(QUIZES_FILE, Context.MODE_PRIVATE).getString(CURRENT_QUIZ, "No Quiz Selected");
 			((TextView) rootView.findViewById(R.id.current_quiz)).setText(currentQuiz);
 			return rootView;
 		}
@@ -106,7 +103,7 @@ public class MainActivity extends MathsActivity {
 			    String buttonText = b.getText().toString();
 				Log.v(TAG, String.format("onClick:%s.", buttonText));
 				if (buttonText.equals(NEW_USER)) {
-					getFragmentManager().beginTransaction().replace(R.id.container, new NewUserFragment()).commit();
+					getFragmentManager().beginTransaction().replace(R.id.container, new NewUserFragment()).addToBackStack(null).commit();
 					return;
 				}
 
@@ -120,6 +117,8 @@ public class MainActivity extends MathsActivity {
 			}
 			
 		}
+		
+		//NEWREL: I think you need to implement ...public void onBackStackChanged() {... to redraw the user list on back navigation.
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -151,6 +150,50 @@ public class MainActivity extends MathsActivity {
 		}
 	}
 
+	public void createUserButtonClick (View view) {
+		Log.v(TAG, "createUserButtonClick");
+		EditText input = (EditText) findViewById(R.id.new_user_input);
+		String newUser = input.getText().toString();
+		String newUserFile = USERS_FILE + "." + newUser;
+		
+		TextView status = (TextView) findViewById(R.id.status_message);
+		if (newUser.equals("")) {
+			status.setText(R.string.blank_user_error);
+			return;
+		}
+		if (newUser.equals(NEW_USER)) {
+			status.setText(R.string.new_user_error);
+			return;
+		}
+		//NEWREL: Limit the length of the user name
+		
+		SharedPreferences pref = getSharedPreferences(USERS_FILE, Context.MODE_PRIVATE);
+		Set<String> userSet = pref.getStringSet(USER_LIST, new HashSet<String>());
+		// NEWREL: Make case insensitive, but preserve case in the set.
+		
+		if (userSet.contains(newUser)) {
+			status.setText(R.string.user_exists_error);
+			return;
+		}
+		
+		// Create the preferences file for this user.
+		SharedPreferences userPref = getSharedPreferences(newUserFile, Context.MODE_PRIVATE);
+		SharedPreferences.Editor userEditor = userPref.edit();
+		userEditor.commit();
+
+		// Add the new user to the set of users.
+		userSet.add(newUser);
+		SharedPreferences.Editor editor = pref.edit();
+		editor.putStringSet(USER_LIST, userSet);
+		
+		// Change the current user to this user.
+		editor.putString(CURRENT_USER, newUser);
+		editor.commit();
+
+		getFragmentManager().popBackStack();
+		return;
+	}
+	
 	public static class QuizSelectionFragment extends Fragment {
 		
 		public class QuizSelectionFragmentListener implements View.OnClickListener {
@@ -206,25 +249,6 @@ public class MainActivity extends MathsActivity {
 		}
 	}
 
-	public void deleteQuizButtonClick (View view) {
-		SharedPreferences pref = getSharedPreferences(QUIZES_FILE, Context.MODE_PRIVATE);
-		Set<String> quiz_list = pref.getStringSet(QUIZ_LIST, new HashSet<String>());
-		String currentQuiz = pref.getString(CURRENT_QUIZ, "");
-		
-		Log.v(TAG, String.format("deleteQuizButtonClick:%s.", currentQuiz));
-		
-		quiz_list.remove(currentQuiz);
-		
-		SharedPreferences.Editor editor = pref.edit();
-		editor.putStringSet(QUIZ_LIST, quiz_list);
-		editor.remove(CURRENT_QUIZ);
-		editor.commit();
-		
-		// Transition back to the User Selection Screen.
-		getFragmentManager().beginTransaction().replace(R.id.container, new QuizSelectionFragment()).commit();
-		return;
-	}
-
 	public void createQuizButtonClick (View view) {
 		Log.v(TAG, "createQuizButtonClick");
 		EditText input = (EditText) findViewById(R.id.new_quiz_input);
@@ -268,9 +292,7 @@ public class MainActivity extends MathsActivity {
 		editor.putStringSet(QUIZ_LIST, quizSet);
 		editor.commit();
 		
-		// Transition back to the User Selection Screen.
-		// BUGBUG:?I think this might need to do a pop on the BackStack instead...
-		getFragmentManager().beginTransaction().replace(R.id.container, new QuizSelectionFragment()).commit();
+		getFragmentManager().popBackStack();
 		return;
 	}
 	
@@ -281,6 +303,24 @@ public class MainActivity extends MathsActivity {
 			View rootView = inflater.inflate(R.layout.fragment_new_quiz, container, false);
 			return rootView;
 		}
+	}
+
+	public void deleteQuizButtonClick (View view) {
+		SharedPreferences pref = getSharedPreferences(QUIZES_FILE, Context.MODE_PRIVATE);
+		Set<String> quiz_list = pref.getStringSet(QUIZ_LIST, new HashSet<String>());
+		String currentQuiz = pref.getString(CURRENT_QUIZ, "");
+		
+		Log.v(TAG, String.format("deleteQuizButtonClick:%s.", currentQuiz));
+		
+		quiz_list.remove(currentQuiz);
+		
+		SharedPreferences.Editor editor = pref.edit();
+		editor.putStringSet(QUIZ_LIST, quiz_list);
+		editor.remove(CURRENT_QUIZ);
+		editor.commit();
+
+		getFragmentManager().popBackStack();
+		return;
 	}
 	
 	public static class QuizFragment extends Fragment {
@@ -330,49 +370,6 @@ public class MainActivity extends MathsActivity {
 		}
 	}
 	
-	public void createUserButtonClick (View view) {
-		Log.v(TAG, "createUserButtonClick");
-		EditText input = (EditText) findViewById(R.id.new_user_input);
-		String newUser = input.getText().toString();
-		String newUserFile = QUIZES_FILE + "." + newUser;
-		
-		TextView status = (TextView) findViewById(R.id.status_message);
-		if (newUser.equals("")) {
-			status.setText(R.string.blank_user_error);
-			return;
-		}
-		if (newUser.equals(NEW_USER)) {
-			status.setText(R.string.new_user_error);
-			return;
-		}
-		//NEWREL: Limit the length of the user name
-		
-		SharedPreferences pref = getSharedPreferences(USERS_FILE, Context.MODE_PRIVATE);
-		Set<String> userSet = pref.getStringSet(USER_LIST, new HashSet<String>());
-		// NEWREL: Make case insensitive, but preserve case in the set.
-		
-		if (userSet.contains(newUser)) {
-			status.setText(R.string.user_exists_error);
-			return;
-		}
-		
-		// Create the preferences file for this user.
-		SharedPreferences userPref = getSharedPreferences(newUserFile, Context.MODE_PRIVATE);
-		SharedPreferences.Editor userEditor = userPref.edit();
-		userEditor.commit();
-
-		// Add the new user to the set of users.
-		userSet.add(newUser);
-		SharedPreferences.Editor editor = pref.edit();
-		editor.putStringSet(USER_LIST, userSet);
-		editor.commit();
-		
-		// Transition back to the User Selection Screen.
-		// BUGBUG:?I think this might need to do a pop on the BackStack instead...
-		getFragmentManager().beginTransaction().replace(R.id.container, new UserSelectionFragment()).commit();
-		return;
-	}
-	
 	public static class NewUserFragment extends Fragment {
 		
 		@Override
@@ -396,8 +393,7 @@ public class MainActivity extends MathsActivity {
 		editor.remove(CURRENT_USER);
 		editor.commit();
 		
-		// Transition back to the User Selection Screen.
-		getFragmentManager().beginTransaction().replace(R.id.container, new UserSelectionFragment()).commit();
+		getFragmentManager().popBackStack();
 		return;
 	}
 	
