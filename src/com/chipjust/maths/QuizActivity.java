@@ -44,9 +44,6 @@ public class QuizActivity extends MathsActivity {
 	private int operand2 = 0;
 	private String operator = "?";
 	private int answer = 0;
-	private static final String COLOR_GREEN = "#30E873";
-	private static final String COLOR_RED = "#FF1028";
-	
 	
 	// We have one button handler, and we pause between clicks. We only allow one click per question.
 	// So this boolean gates the buttonClick function to ignore new input until we draw a new question (fragment)
@@ -136,13 +133,16 @@ public class QuizActivity extends MathsActivity {
 	private Bundle setNewQuestion() {
 		Random rand = new Random();
 		//NEWREL: move these to the class
-		String currentUser = getSharedPreferences(USERS_FILE, Context.MODE_PRIVATE).getString(CURRENT_USER, "");
-		SharedPreferences userPref = getSharedPreferences(currentUser, Context.MODE_PRIVATE);
+		//String currentUser = getSharedPreferences(USERS_FILE, Context.MODE_PRIVATE).getString(CURRENT_USER, "");
+		//SharedPreferences userPref = getSharedPreferences(currentUser, Context.MODE_PRIVATE);
+		String currentQuiz = getSharedPreferences(QUIZES_FILE, Context.MODE_PRIVATE).getString(CURRENT_QUIZ, "");
+		String currentQuizFile = QUIZES_FILE + "." + currentQuiz;
+		SharedPreferences quizPref = getSharedPreferences(currentQuizFile, Context.MODE_PRIVATE);
 
 		// Operator
 		List<String> myOperators = new ArrayList<String>();
 		for (String op : operators) {
-			if (userPref.getBoolean(op, true)) {
+			if (quizPref.getBoolean(op, true)) {
 				myOperators.add(op);
 			}
 		}
@@ -152,7 +152,7 @@ public class QuizActivity extends MathsActivity {
 		// Operands
 		List<Integer> myNumbers = new ArrayList<Integer>();
 		for (Integer i : numbers) {
-			if (userPref.getBoolean(i.toString(), true)) {
+			if (quizPref.getBoolean(i.toString(), true)) {
 				myNumbers.add(i);
 			}
 		}

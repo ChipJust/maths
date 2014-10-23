@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+	
+	<TextView 
+        android:id="@+id/quiz_input_message"
+        android:text="@string/quiz_input_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+	
+	<EditText
+	    android:id="@+id/new_quiz_input"
+	    android:hint="@string/new_quiz"
+	    android:inputType="textCapWords"
+	    android:singleLine="true"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content" />
+
+	<Button 
+        android:id="@+id/create_quiz_button"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:text="@string/create_quiz"
+        android:onClick="createQuizButtonClick" />	
+
+	<TextView 
+        android:id="@+id/quiz_status_message"
+        android:textColor="#C20E0E"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

@@ -18,5 +18,13 @@
     <string name="select_user">Select User</string>
     <string name="select_quiz">Select Quiz</string>
     <string name="user_stats">User Statistics (Score)</string>
+    <string name="delete_quiz">Delete Quiz</string>
+    <string name="quiz_input_message">Input New Quiz Name</string>
+    <string name="new_quiz">New Quiz</string>
+    <string name="create_quiz">Create Quiz</string>
+    <string name="quiz_exists_error">Can\'t create a quiz that already exists.</string>
+    <string name="new_quiz_error">Can\'t name the quiz \"New Quiz\".</string>
+    <string name="blank_quiz_error">Can\'t add a blank string as quiz. Must be at least one character.</string>
+    
     
 </resources>
